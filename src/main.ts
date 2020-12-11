@@ -30,21 +30,33 @@ class Joke {
     <div class="card card-block">
       <h4 class="card-title">{{ data.setup }}</h4>
       <p class="card-text" [hidden]="data.hide">{{ data.punchline }}</p>
-      <button class="btn btn-primary" (click)="data.toggle()">
+      <button class="btn btn-warning" (click)="data.toggle()">
         Dime
+      </button>
+      <button class="btn btn-danger" (click)="deleteItem()">
+        Eliminar
       </button>
     </div>
   `
 })
 class JokeComponent {
   @Input("joke") data: Joke;
+  @Output() jokeDeleted = new EventEmitter<Joke>();
+
+  deleteItem() {
+    this.jokeDeleted.emit(this.data);
+  }
 }
 
 @Component({
   selector: "joke-list",
   template: `
     <joke-form (jokeCreated)="addJoke($event)"></joke-form>
-    <joke *ngFor="let j of jokes" [joke]="j"></joke>
+    <joke
+      *ngFor="let j of jokes"
+      [joke]="j"
+      (jokeDeleted)="deleteJoke($event)"
+    ></joke>
   `
 })
 class JokeListComponent {
@@ -70,6 +82,14 @@ class JokeListComponent {
   addJoke(joke) {
     this.jokes.unshift(joke);
   }
+
+  deleteJoke(joke) {
+    let indexToDelete = this.jokes.indexOf(joke);
+
+    if (indexToDelete !== -1) {
+      this.jokes.splice(indexToDelete, 1);
+    }
+  }
 }
 
 @Component({
@@ -93,7 +113,11 @@ class JokeListComponent {
           #punchline
         />
       </div>
-      <button type="button" class="btn btn-primary" (click)="createJoke(setup.value, punchline.value)">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="createJoke(setup.value, punchline.value)"
+      >
         Crear
       </button>
     </div>
