@@ -1,7 +1,12 @@
-import { Component, Input, NgModule, Output } from "@angular/core";
+import {
+  Component,
+  Input,
+  NgModule,
+  EventEmitter,
+  Output
+} from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
-import { EventEmitter } from "events";
 
 class Joke {
   setup: string;
@@ -61,6 +66,10 @@ class JokeListComponent {
       )
     ];
   }
+
+  addJoke(joke) {
+    this.jokes.unshift(joke);
+  }
 }
 
 @Component({
@@ -73,6 +82,7 @@ class JokeListComponent {
           type="text"
           class="form-control"
           placeholder="Ingrese la pregunta"
+          #setup
         />
       </div>
       <div class="form-group">
@@ -80,14 +90,21 @@ class JokeListComponent {
           type="text"
           class="form-control"
           placeholder="Ingrese la respuesta"
+          #punchline
         />
       </div>
-      <button type="button" class="btn btn-primary">Crear</button>
+      <button type="button" class="btn btn-primary" (click)="createJoke(setup.value, punchline.value)">
+        Crear
+      </button>
     </div>
   `
 })
 class JokeFormComponent {
   @Output() jokeCreated = new EventEmitter<Joke>();
+
+  createJoke(setup: string, punchline: string) {
+    this.jokeCreated.emit(new Joke(setup, punchline));
+  }
 }
 
 @Component({
